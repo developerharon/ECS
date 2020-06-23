@@ -19,7 +19,7 @@ namespace Ecs.Controllers.ApiControllers
         }
 
         [HttpPost("register")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> RegisterAsync(RegisterModel model)
         {
             var result = await _employeeService.RegisterAsync(model);

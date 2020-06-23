@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 
 namespace Ecs.Entities
 {
@@ -7,5 +8,6 @@ namespace Ecs.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public string Department { get; set; }
+        public List<RefreshToken> RefreshTokens { get; set; }
     }
 }
