@@ -150,6 +150,26 @@ namespace Ecs.Services
             return authenticateModel;
         }
 
+        public bool RevokeToken(string token)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+
+            // Return false if no user found with the token
+            if (user == null) return false;
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+            // Return false if the token is not active
+            if (!refreshToken.IsActive) return false;
+
+            // Revoke token then save
+            refreshToken.Revoked = DateTime.UtcNow;
+            _context.Update(user);
+            _context.SaveChanges();
+
+            return true;
+        }
+
         private async Task<JwtSecurityToken> CreateJwtToken(Employee user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
