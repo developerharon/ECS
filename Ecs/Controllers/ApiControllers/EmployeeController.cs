@@ -7,7 +7,7 @@ namespace Ecs.Controllers.ApiControllers
     [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    public class EmployeeController
+    public class EmployeeController : ControllerBase
     {
         private readonly IEmployeeService _employeeService;
 
