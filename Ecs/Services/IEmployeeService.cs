@@ -7,5 +7,6 @@ namespace Ecs.Services
     {
         Task<string> RegisterAsync(RegisterModel model);
         Task<AuthenticatedModel> GetTokenAsync(LoginModel model);
+        Task<AuthenticatedModel> RefreshTokenAsync(string token);
     }
 }

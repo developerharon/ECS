@@ -4,6 +4,7 @@ using Ecs.Models;
 using Ecs.Settings;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.CodeAnalysis.Options;
+using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System;
@@ -11,6 +12,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -82,6 +84,22 @@ namespace Ecs.Services
                 authenticateModel.Username = user.UserName;
                 var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
                 authenticateModel.Roles = rolesList.ToList();
+
+                if (user.RefreshTokens.Any(a => a.IsActive))
+                {
+                    var activeRefreshToken = user.RefreshTokens.Where(a => a.IsActive == true).FirstOrDefault();
+                    authenticateModel.RefreshToken = activeRefreshToken.Token;
+                    authenticateModel.RefreshTokenExpiration = activeRefreshToken.Expires;
+                }
+                else
+                {
+                    var refreshToken = CreateRefreshToken();
+                    authenticateModel.RefreshToken = refreshToken.Token;
+                    authenticateModel.RefreshTokenExpiration = refreshToken.Expires;
+                    user.RefreshTokens.Add(refreshToken);
+                    _context.Update(user);
+                    _context.SaveChanges();
+                }
                 return authenticateModel;
             }
 
@@ -90,6 +108,47 @@ namespace Ecs.Services
             return authenticateModel;
         }
 
+        public async Task<AuthenticatedModel> RefreshTokenAsync(string token)
+        {
+            var authenticateModel = new AuthenticatedModel();
+            var user = _context.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+
+            if (user == null)
+            {
+                authenticateModel.IsAuthenticated = false;
+                authenticateModel.Message = $"Token did not match any users.";
+                return authenticateModel;
+            }
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+            if (!refreshToken.IsActive)
+            {
+                authenticateModel.IsAuthenticated = false;
+                authenticateModel.Message = $"Token Not Active";
+                return authenticateModel;
+            }
+
+            // Revoke Current Refresh Token
+            refreshToken.Revoked = DateTime.UtcNow;
+
+            // Generate new Refresh Token and save to the database
+            var newRefreshToken = CreateRefreshToken();
+            _context.Update(user);
+            _context.SaveChanges();
+
+            // Generate new JWT
+            authenticateModel.IsAuthenticated = true;
+            JwtSecurityToken jwtSecurityToken = await CreateJwtToken(user);
+            authenticateModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
+            authenticateModel.Email = user.Email;
+            authenticateModel.Username = user.UserName;
+            var rolesList = await _userManager.GetRolesAsync(user).ConfigureAwait(false);
+            authenticateModel.Roles = rolesList.ToList();
+            authenticateModel.RefreshToken = newRefreshToken.Token;
+            authenticateModel.RefreshTokenExpiration = newRefreshToken.Expires;
+            return authenticateModel;
+        }
 
         private async Task<JwtSecurityToken> CreateJwtToken(Employee user)
         {
@@ -121,6 +180,22 @@ namespace Ecs.Services
                 expires: DateTime.UtcNow.AddMinutes(_jwt.DurationInMinutes),
                 signingCredentials: signingCredentials);
             return jwtSecurityToken;
+        }
+
+        private RefreshToken CreateRefreshToken()
+        {
+            var randomNumber = new byte[32];
+
+            using (var generator = new RNGCryptoServiceProvider())
+            {
+                generator.GetBytes(randomNumber);
+                return new RefreshToken
+                {
+                    Token = Convert.ToBase64String(randomNumber),
+                    Expires = DateTime.UtcNow.AddDays(10),
+                    Created = DateTime.UtcNow
+                };
+            }
         }
     }
 }

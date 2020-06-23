@@ -1,7 +1,9 @@
 ﻿using Ecs.Models;
 using Ecs.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Threading.Tasks;
 
 namespace Ecs.Controllers.ApiControllers
@@ -32,7 +34,28 @@ namespace Ecs.Controllers.ApiControllers
         public async Task<IActionResult> GetTokenAsync(LoginModel model)
         {
             var result = await _employeeService.GetTokenAsync(model);
+            SetRefreshTokenInCookie(result.RefreshToken);
             return Ok(result);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken()
+        {
+            var refreshToken = Request.Cookies["refreshToken"];
+            var response = await _employeeService.RefreshTokenAsync(refreshToken);
+            if (!String.IsNullOrEmpty(response.RefreshToken))
+                SetRefreshTokenInCookie(response.RefreshToken);
+            return Ok(response);
+        }
+
+        private void SetRefreshTokenInCookie(string refreshToken)
+        {
+            var cookieOptions = new CookieOptions
+            {
+                HttpOnly = true,
+                Expires = DateTime.UtcNow.AddDays(10)
+            };
+            Response.Cookies.Append("refreshToken", refreshToken);
         }
     }
 }
