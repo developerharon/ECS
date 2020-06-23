@@ -1,6 +1,11 @@
-﻿namespace Ecs.Services
+﻿using Ecs.Models;
+using System.Threading.Tasks;
+
+namespace Ecs.Services
 {
-    public class IEmployeeService
+    public interface IEmployeeService
     {
+        Task<string> RegisterAsync(RegisterModel model);
+        Task<AuthenticatedModel> GetTokenAsync(LoginModel model);
     }
 }

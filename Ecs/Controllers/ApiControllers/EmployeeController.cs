@@ -1,6 +1,8 @@
-﻿using Ecs.Services;
+﻿using Ecs.Models;
+using Ecs.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace Ecs.Controllers.ApiControllers
 {
@@ -14,6 +16,23 @@ namespace Ecs.Controllers.ApiControllers
         public EmployeeController(IEmployeeService employeeService)
         {
             _employeeService = employeeService;
+        }
+
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterAsync(RegisterModel model)
+        {
+            var result = await _employeeService.RegisterAsync(model);
+
+            return Ok(result);
+        }
+
+        [HttpPost("login")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetTokenAsync(LoginModel model)
+        {
+            var result = await _employeeService.GetTokenAsync(model);
+            return Ok(result);
         }
     }
 }
