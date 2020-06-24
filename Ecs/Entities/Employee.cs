@@ -9,5 +9,6 @@ namespace Ecs.Entities
         public string LastName { get; set; }
         public string Department { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
+        public List<TimeStamp> TimeStamps { get; set; }
     }
 }
