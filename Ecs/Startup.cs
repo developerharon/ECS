@@ -37,6 +37,9 @@ namespace Ecs
             services.AddIdentity<Employee, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddScoped<IEmployeeService, EmployeeService>();
 
+            // Timestamp Manager services
+            services.AddScoped<ITimestampServices, TimestampServices>();
+
             // Adding database context with MSSQL
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
