@@ -34,7 +34,7 @@ namespace Ecs
             services.Configure<JWT>(_configuration.GetSection("JWT"));
 
             // Employee Manager services
-            services.AddIdentity<Employee, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
+            services.AddIdentity<Employee, IdentityRole>(options => options.User.RequireUniqueEmail = true).AddEntityFrameworkStores<ApplicationDbContext>();
             services.AddScoped<IEmployeeService, EmployeeService>();
 
             // Timestamp Manager services
@@ -76,6 +76,7 @@ namespace Ecs
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseStaticFiles();
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseAuthentication();
