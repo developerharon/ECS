@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -23,6 +24,9 @@ namespace Ecs.Services
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly JWT _jwt;
         private readonly ApplicationDbContext _context;
+        private readonly IUserValidator<Employee> _userValidator;
+        private readonly IPasswordValidator<Employee> _passwordValidator;
+        private readonly IPasswordHasher<Employee> _passwordHasher;
 
         public EmployeeService(UserManager<Employee> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, ApplicationDbContext context)
         {
@@ -31,6 +35,8 @@ namespace Ecs.Services
             _jwt = jwt.Value;
             _context = context;
         }
+
+        public IQueryable<Employee> Employees => _userManager.Users;
 
         public async Task<IdentityResult> RegisterEmployeeAsync(RegisterModel model)
         {
@@ -45,6 +51,57 @@ namespace Ecs.Services
 
             IdentityResult result = await _userManager.CreateAsync(employee, model.Password);
 
+            return result;
+        }
+
+        public async Task<IdentityResult> DeleteEmployeeAsync(string id)
+        {
+            Employee user = await _userManager.FindByIdAsync(id);
+
+            if (user != null)
+            {
+                IdentityResult result = await _userManager.DeleteAsync(user);
+                return result;
+            }
+            return null;
+        }
+
+        public async Task<IdentityResult> EditEmployeeAsync(EditModel model)
+        {
+            Employee user = await _userManager.FindByIdAsync(model.employeeId);
+
+            if (user == null)
+                return null;
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.Department = model.Department;
+            user.UserName = model.Username;
+            user.Email = model.employeeId;
+
+            IdentityResult isUserValid = await _userValidator.ValidateAsync(_userManager, user);
+
+            if (!isUserValid.Succeeded)
+                return isUserValid;
+
+            IdentityResult result = await _userManager.UpdateAsync(user);
+            return result;
+        }
+
+        public async Task<IdentityResult> ChangePassword(string employeeId, string password)
+        {
+            Employee user = await _userManager.FindByIdAsync(employeeId);
+
+            if (user == null)
+                return null;
+
+            IdentityResult isPasswordValid = await _passwordValidator.ValidateAsync(_userManager, user, password);
+
+            if (!isPasswordValid.Succeeded)
+                return isPasswordValid;
+
+            user.PasswordHash = _passwordHasher.HashPassword(user, password);
+            IdentityResult result = await _userManager.UpdateAsync(user);
             return result;
         }
 

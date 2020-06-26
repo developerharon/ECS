@@ -1,28 +1,25 @@
-﻿using Ecs.Contexts;
-using Ecs.Entities;
+﻿using Ecs.Entities;
 using Ecs.Models;
 using Ecs.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ecs.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly UserManager<Employee> _userManager;
         private readonly IEmployeeService _employeeService;
 
-        public AdminController(UserManager<Employee> userManager, IEmployeeService employeeService)
+        public AdminController(IEmployeeService employeeService)
         {
-            _userManager = userManager;
             _employeeService = employeeService;
         }
 
         public IActionResult Index()
         {
-            return View(_userManager.Users);
+            return View(_employeeService.Employees);
         }
 
         public ViewResult Register() => View();
@@ -52,40 +49,29 @@ namespace Ecs.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(string id)
         {
-            Employee user = await _userManager.FindByIdAsync(id);
-
-            if (user != null)
+            IdentityResult result = await _employeeService.DeleteEmployeeAsync(id);
+            if (result != null && result.Succeeded)
             {
-                IdentityResult result = await _userManager.DeleteAsync(user);
-
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("Index");
-                }
-                else
-                {
-                    AddErrorsFromResult(result);
-                }
+                return RedirectToAction("Index");
             }
             else
             {
+                if (result.Errors.ToList().Count() != 0)
+                    AddErrorsFromResult(result);
+
                 ModelState.AddModelError("", "User Not Found");
             }
-            return View("Index", _userManager.Users);
+            return View("Index", _employeeService.Employees);
         }
 
         public async Task<IActionResult> Edit(string id)
         {
-            Employee user = await _userManager.FindByIdAsync(id);
+            var employee = _employeeService.Employees.Single(e => e.Id == id);
 
-            if (user != null)
-            {
-                return View(user);
-            }
-            else
-            {
-                return RedirectToAction("Index");
-            }
+            if (employee != null)
+                return View(employee);
+
+            return RedirectToAction("Index");
         }
 
         //[HttpPost]
