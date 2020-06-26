@@ -32,7 +32,7 @@ namespace Ecs.Services
             _context = context;
         }
 
-        public async Task<string> RegisterAsync(RegisterModel model)
+        public async Task<IdentityResult> RegisterEmployeeAsync(RegisterModel model)
         {
             var employee = new Employee
             {
@@ -43,22 +43,9 @@ namespace Ecs.Services
                 Email = model.Email
             };
 
-            var userWithSameEmail = await _userManager.FindByEmailAsync(model.Email);
-            
-            if (userWithSameEmail == null)
-            {
-                var result = await _userManager.CreateAsync(employee, model.Password);
+            IdentityResult result = await _userManager.CreateAsync(employee, model.Password);
 
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(employee, Authorization.default_role.ToString());
-                }
-                return $"User Registered with username {employee.UserName}";
-            }
-            else
-            {
-                return $"Email {employee.Email} is already registered.";
-            }
+            return result;
         }
 
         public async Task<AuthenticatedModel> GetTokenAsync(LoginModel model)

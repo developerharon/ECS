@@ -2,6 +2,7 @@
 using Ecs.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -24,9 +25,13 @@ namespace Ecs.Controllers.ApiControllers
         [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> RegisterAsync(RegisterModel model)
         {
-            var result = await _employeeService.RegisterAsync(model);
+            IdentityResult result = await _employeeService.RegisterEmployeeAsync(model);
 
-            return Ok(result);
+            if (result.Succeeded)
+            {
+                return Ok();
+            }
+            return BadRequest(result.Errors);
         }
 
         [HttpPost("login")]

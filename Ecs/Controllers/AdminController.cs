@@ -2,6 +2,7 @@
 using Ecs.Entities;
 using Ecs.Models;
 using Ecs.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -10,20 +11,18 @@ namespace Ecs.Controllers
 {
     public class AdminController : Controller
     {
-        private readonly ApplicationDbContext _context;
-        private readonly IEmployeeService _employeeService;
         private readonly UserManager<Employee> _userManager;
+        private readonly IEmployeeService _employeeService;
 
-        public AdminController(ApplicationDbContext context, IEmployeeService service, UserManager<Employee> userManager)
+        public AdminController(UserManager<Employee> userManager, IEmployeeService employeeService)
         {
-            _context = context;
-            _employeeService = service;
             _userManager = userManager;
+            _employeeService = employeeService;
         }
 
         public IActionResult Index()
         {
-            return View(_context.Users);
+            return View(_userManager.Users);
         }
 
         public ViewResult Register() => View();
@@ -33,16 +32,7 @@ namespace Ecs.Controllers
         {
             if (ModelState.IsValid)
             {
-                Employee user = new Employee
-                {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    Department = model.Department,
-                    UserName = model.Username,
-                    Email = model.Email
-                };
-
-                IdentityResult result = await _userManager.CreateAsync(user, model.Password);
+                IdentityResult result = await _employeeService.RegisterEmployeeAsync(model);
 
                 if (result.Succeeded)
                 {
@@ -57,6 +47,59 @@ namespace Ecs.Controllers
                 }
             }
             return View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(string id)
+        {
+            Employee user = await _userManager.FindByIdAsync(id);
+
+            if (user != null)
+            {
+                IdentityResult result = await _userManager.DeleteAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index");
+                }
+                else
+                {
+                    AddErrorsFromResult(result);
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "User Not Found");
+            }
+            return View("Index", _userManager.Users);
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            Employee user = await _userManager.FindByIdAsync(id);
+
+            if (user != null)
+            {
+                return View(user);
+            }
+            else
+            {
+                return RedirectToAction("Index");
+            }
+        }
+
+        //[HttpPost]
+        //public async Task<IActionResult> Edit(RegisterModel model)
+        //{
+
+        //}
+
+        private void AddErrorsFromResult(IdentityResult result)
+        {
+            foreach (IdentityError error in result.Errors)
+            {
+                ModelState.AddModelError("", error.Description);
+            }
         }
     }
 }
