@@ -1,5 +1,4 @@
-﻿using Ecs.Entities;
-using Ecs.Models;
+﻿using Ecs.Models;
 using Ecs.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -64,7 +63,7 @@ namespace Ecs.Controllers
             return View("Index", _employeeService.Employees);
         }
 
-        public async Task<IActionResult> Edit(string id)
+        public IActionResult Edit(string id)
         {
             var employee = _employeeService.Employees.Single(e => e.Id == id);
 
@@ -74,11 +73,19 @@ namespace Ecs.Controllers
             return RedirectToAction("Index");
         }
 
-        //[HttpPost]
-        //public async Task<IActionResult> Edit(RegisterModel model)
-        //{
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditModel model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
 
-        //}
+            IdentityResult result = await _employeeService.EditEmployeeAsync(model);
+            
+            if (result.Succeeded)
+                return RedirectToAction("Index");
+
+            return View(model);
+        }
 
         private void AddErrorsFromResult(IdentityResult result)
         {

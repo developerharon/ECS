@@ -9,7 +9,7 @@ namespace Ecs.Services
 {
     public interface IEmployeeService
     {
-        IQueryable<Employee> Employees { get }
+        IQueryable<Employee> Employees { get; }
 
         Task<IdentityResult> RegisterEmployeeAsync(RegisterModel model);
         Task<IdentityResult> DeleteEmployeeAsync(string id);

@@ -28,12 +28,15 @@ namespace Ecs.Services
         private readonly IPasswordValidator<Employee> _passwordValidator;
         private readonly IPasswordHasher<Employee> _passwordHasher;
 
-        public EmployeeService(UserManager<Employee> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, ApplicationDbContext context)
+        public EmployeeService(UserManager<Employee> userManager, RoleManager<IdentityRole> roleManager, IOptions<JWT> jwt, ApplicationDbContext context, IUserValidator<Employee> userValidator, IPasswordValidator<Employee> passwordValidator, IPasswordHasher<Employee> passwordHasher)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _jwt = jwt.Value;
             _context = context;
+            _userValidator = userValidator;
+            _passwordValidator = passwordValidator;
+            _passwordHasher = passwordHasher;
         }
 
         public IQueryable<Employee> Employees => _userManager.Users;
