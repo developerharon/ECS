@@ -2,6 +2,7 @@
 using Ecs.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.IO;
 using System.Threading.Tasks;
@@ -25,6 +26,20 @@ namespace Ecs.Controllers
         }
 
         public IActionResult ListEmployees() => View(_userManager.Users);
+
+        public async Task<IActionResult> ListAdministrators()
+        {
+            List<ApplicationUser> admins = new List<ApplicationUser>();
+
+            foreach (var user in _userManager.Users)
+            {
+                if (await _userManager.IsInRoleAsync(user, SeedDatabase.Authorization.Roles.Administrators.ToString()))
+                {
+                    admins.Add(user);
+                }
+            }
+            return View(admins);
+        }
 
         public IActionResult Create() => View();
 
@@ -136,6 +151,36 @@ namespace Ecs.Controllers
                 ModelState.AddModelError("", "User Not Found");
             }
             return View("ListEmployees", _userManager.Users);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RemoveAdministrator(string id)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+
+            if (user != null)
+            {
+                if (await _userManager.IsInRoleAsync(user, SeedDatabase.Authorization.Roles.Administrators.ToString()))
+                {
+                    IdentityResult result = await _userManager.RemoveFromRoleAsync(user, SeedDatabase.Authorization.Roles.Administrators.ToString());
+
+                    if (result.Succeeded)
+                    {
+                        TempData["message"] = $"{user.UserName} removed as an administrator";
+                        return RedirectToAction("ListAdministrators");
+                    }
+                    TempData["message"] = "An error occurred when processing your request";
+                }
+                else
+                {
+                    TempData["message"] = $"{user.UserName} is not an administrator";
+                }
+            }
+            else
+            {
+                ModelState.AddModelError("", "User Not Found");
+            }
+            return RedirectToAction("ListAdministrators");
         }
 
         private void AddErrorsFromResult(IdentityResult result)
