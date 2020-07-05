@@ -2,6 +2,7 @@
 using Ecs.Models.ViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.IO;
@@ -13,11 +14,13 @@ namespace Ecs.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IUserValidator<ApplicationUser> _userValidator;
 
-        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUserValidator<ApplicationUser> userValidator)
         {
             _userManager = userManager;
             _roleManager = roleManager;
+            _userValidator = userValidator;
         }
 
         public IActionResult Index()
@@ -92,6 +95,63 @@ namespace Ecs.Controllers
                     foreach (IdentityError error in result.Errors)
                     {
                         ModelState.AddModelError("", error.Description);
+                    }
+                }
+            }
+            return View(model);
+        }
+
+        public async Task<IActionResult> Edit(string id)
+        {
+            ApplicationUser user = await _userManager.FindByIdAsync(id);
+
+            if (user != null)
+            {
+                return View(new EditViewModel { Id = user.Id, Name = user.Name, Email = user.Email, Department = user.Department });
+            } else
+            {
+                return RedirectToAction("ListEmployees");
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(EditViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                ApplicationUser user = await _userManager.FindByIdAsync(model.Id);
+
+                if (user != null)
+                {
+                    user.Name = model.Name;
+                    user.Email = model.Email;
+                    user.Department = model.Department;
+
+                    if (model.ProfilePicture != null)
+                    {
+                        using (var datastream = new MemoryStream())
+                        {
+                            await model.ProfilePicture.CopyToAsync(datastream);
+                            user.ProfilePicture = datastream.ToArray();
+                        }
+                    }
+
+                    IdentityResult validUser = await _userValidator.ValidateAsync(_userManager, user);
+
+                    if (!validUser.Succeeded)
+                    {
+                        AddErrorsFromResult(validUser);
+                    }
+
+                    IdentityResult result = await _userManager.UpdateAsync(user);
+
+                    if (result.Succeeded)
+                    {
+                        return RedirectToAction("ListEmployees");
+                    }
+                    else
+                    {
+                        AddErrorsFromResult(result);
                     }
                 }
             }
