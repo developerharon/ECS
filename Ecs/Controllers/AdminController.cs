@@ -6,6 +6,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Ecs.Controllers
@@ -28,7 +29,12 @@ namespace Ecs.Controllers
             return View();
         }
 
-        public IActionResult ListEmployees() => View(_userManager.Users);
+        public IActionResult ListEmployees(string searchParameter = null)
+        {
+            if (!string.IsNullOrWhiteSpace(searchParameter))
+                return View(_userManager.Users.Where(user => ((user.UserName.Contains(searchParameter) || user.Name.Contains(searchParameter) || user.Department.Contains(searchParameter) || user.Email.Contains(searchParameter)))));
+            return View(_userManager.Users);
+        }
 
         public async Task<IActionResult> ListAdministrators()
         {
