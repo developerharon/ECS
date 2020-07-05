@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -6,7 +7,7 @@ namespace Ecs.Models
 {
     public class SeedDatabase
     {
-        private class Authorization
+        public class Authorization
         {
             public enum Roles
             {
@@ -31,7 +32,7 @@ namespace Ecs.Models
             if (userManager.Users.All(u => u.Email != Authorization.default_email))
             {
                 await userManager.CreateAsync(defaultUser, Authorization.default_password);
-                await userManager.AddToRoleAsync(defaultUser, Authorization.Roles.Administrators.ToString());
+                await userManager.AddToRolesAsync(defaultUser, new List<string> { Authorization.Roles.Administrators.ToString(), Authorization.Roles.Users.ToString() });
             }
         }
     }

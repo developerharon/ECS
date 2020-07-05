@@ -1,0 +1,43 @@
+﻿@model IEnumerable<ApplicationUser>
+
+<div class="bg-primary m-1 p-1 text-white"><h4>Employee Accounts</h4></div>
+
+<table class="table table-sm table-bordered">
+    <tr><th>ID</th><th>Profile Picture</th><th>Username</th><th>Name</th><th>Email</th><th>Actions</th></tr>
+
+    @if (Model.Count() == 0)
+    {
+        <tr><td colspan="5" class="text-center">No Users Accounts</td></tr>
+    }
+    else
+    {
+        @foreach (ApplicationUser user in Model)
+        {
+            <tr>
+                <td>@user.Id</td>
+                @if (user.ProfilePicture == null)
+                {
+                    <td><img src="/images/profile-pic.png" alt="" class="rounded-circle text-center" width="40" height="40" /></td>
+                }
+                else
+                {
+                    <td><img src="@String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(user.ProfilePicture))" alt="" class="rounded-circle text-center" width="40" height="40" /></td>
+                }
+                <td>@user.UserName</td>
+                <td>@user.Name</td>
+                <td>@user.Email</td>
+                <td>
+                    <form asp-action="MakeAdministrator" asp-route-id="@user.Id" method="post" class="form-inline">
+                        <button class="btn btn-sm btn-outline-success" type="submit">Make Admin</button>
+                    </form>
+                    <form asp-action="Delete" asp-controller="Admin" asp-route-id="@user.Id" method="post">
+                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@user.Id">Edit</a>
+                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        }
+    }
+</table>
+
+<a class="btn btn-primary" asp-action="Create">Create</a>

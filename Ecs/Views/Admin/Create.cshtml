@@ -1,0 +1,42 @@
+﻿@model CreateViewModel
+
+<div class="bg-primary m-1 p-1 text-white"><h4 class="text-center">Create Employee Account</h4></div>
+
+<form asp-action="Create" asp-controller="Admin" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label asp-for="ProfilePicture"></label>
+        <input asp-for="ProfilePicture" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Name"></label>
+        <input asp-for="Name" class="form-control" />
+        <div class="text-danger"><span asp-validation-for="Name"></span></div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Username"></label>
+        <input asp-for="Username" class="form-control" />
+        <div class="text-danger"><span asp-validation-for="Username"></span></div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" type="email" />
+        <div class="text-danger"><span asp-validation-for="Email"></span></div>
+    </div>
+    <div class="form-group">
+        <label asp-for="Department"></label>
+        <input asp-for="Department" class="form-control" />
+        <div class="text-danger"><span asp-validation-for="Department"></span></div>
+    </div>
+    <div class="form-group">
+        <label asp-for="NewPassword">New Password</label>
+        <input asp-for="NewPassword" class="form-control" />
+        <div class="text-danger"><span asp-validation-for="NewPassword"></span></div>
+    </div>
+    <div class="form-group">
+        <label asp-for="ConfirmPassword">Confirm Password</label>
+        <input asp-for="ConfirmPassword" class="form-control" />
+        <div class="text-danger"><span asp-validation-for="ConfirmPassword"></span></div>
+    </div>
+    <button type="submit" class="btn btn-outline-primary">Create Account</button>
+    <a asp-action="ListEmployees" class="btn btn-outline-danger">Cancel</a>
+</form>
