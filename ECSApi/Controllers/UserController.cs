@@ -2,6 +2,7 @@
 using ECSApi.Models;
 using ECSApi.Models.ApiModels;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ECSApi.Controllers
@@ -21,6 +22,13 @@ namespace ECSApi.Controllers
         public async Task<IActionResult> GetTokenAsync(TokenRequestModel model)
         {
             var result = await _userService.GetTokenAsync(model);
+            return Ok(result);
+        }
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshToken(string refreshToken)
+        {
+            var result = await _userService.RefreshTokenAsync(refreshToken);
             return Ok(result);
         }
     }
