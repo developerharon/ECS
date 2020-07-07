@@ -12,6 +12,9 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq.Expressions;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Xamarin.Essentials;
 
 namespace ECSApi.Models
 {
@@ -112,6 +115,140 @@ namespace ECSApi.Models
             return authenticationModel;
         }
 
+        public bool RevokeToken(string token)
+        {
+            var user = _context.Users.SingleOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+
+            // Return false if no user is found with the token
+            if (user == null) return false;
+
+            var refreshToken = user.RefreshTokens.Single(x => x.Token == token);
+
+            // Return false if token is not active
+            if (!refreshToken.IsActive) return false;
+
+            // Revoke token and save
+            refreshToken.Revoked = DateTime.UtcNow;
+            _context.Update(user);
+            _context.SaveChanges();
+
+            return true;
+        }
+
+        public async Task<TimestampResponseModel> ClockInAsync(TimestampModel model)
+        {
+            var response = new TimestampResponseModel();
+
+            // Use the email to get the user object from the database
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                response.Succeeded = false;
+                response.Message = "User Not Found";
+                return response;
+            }
+
+            // Create a timestamp object and add it to the list associated with the user's
+            var timestamp = new Timestamp
+            {
+                In = model.ClockTime,
+                InWhileOnPremises = IsEmployeeOnPremises(model.ClockLocation),
+                IsActive = true
+            };
+            user.Timestamps.Add(timestamp);
+            _context.Update(user);
+            _context.SaveChanges();
+
+            // Generate a response for the user
+            response.Succeeded = true;
+            response.Message = "Clocked in successfully";
+            return response;
+        }
+
+        public async Task<TimestampResponseModel> ClockOutAsync(TimestampModel model)
+        {
+            var response = new TimestampResponseModel();
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+
+            if (user == null)
+            {
+                response.Succeeded = false;
+                response.Message = "No User Found";
+                return response;
+            }
+
+            // Find an active timestamp
+            var timestamp = user.Timestamps.Single(timestamp => timestamp.IsActive);
+
+            if (timestamp == null)
+            {
+                response.Succeeded = false;
+                response.Message = "No Active Timestamp";
+                return response;
+            }
+
+            timestamp.IsActive = false;
+            timestamp.Out = model.ClockTime;
+            timestamp.OutWhileOnPremises = IsEmployeeOnPremises(model.ClockLocation);
+            _context.Update(user);
+            _context.SaveChanges();
+
+            // Generate a response for the user
+            response.Succeeded = true;
+            response.Message = "Clocked out successfully";
+            return response;
+        }
+
+        public async Task<TimestampResponseModel> GetActiveClockAsync(string email)
+        {
+            var response = new TimestampResponseModel();
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                response.Succeeded = false;
+                response.IsClockActive = false;
+                response.Message = "No User Found";
+                return response;
+            }
+
+            var anyActiveTimestamp = user.Timestamps.Any(timestamp => timestamp.IsActive);
+
+            if (anyActiveTimestamp)
+            {
+                response.Succeeded = true;
+                response.IsClockActive = true;
+                response.Message = "Active clock found";
+                return response;
+            }
+            else
+            {
+                response.Succeeded = true;
+                response.IsClockActive = false;
+                response.Message = "No Active Clock Found";
+                return response;
+            }
+        }
+
+        public async Task<List<Timestamp>> GetAllClocksAsync(string email)
+        {
+            var response = new List<Timestamp>();
+
+            var user = await _userManager.FindByEmailAsync(email);
+            
+            if (user == null)
+            {
+                return null;
+            }
+            else
+            {
+                response = user.Timestamps;
+                return response;
+            }
+        }
+
         private async Task<JwtSecurityToken> CreateJwtToken(ApplicationUser user)
         {
             var userClaims = await _userManager.GetClaimsAsync(user);
@@ -156,6 +293,12 @@ namespace ECSApi.Models
                     Created = DateTime.Now
                 };
             }
+        }
+
+        private bool IsEmployeeOnPremises(Location clockLocation)
+        {
+            // Location Logic here
+            return true;
         }
     }
 }
