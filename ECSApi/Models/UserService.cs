@@ -92,6 +92,7 @@ namespace ECSApi.Models
             {
                 authenticationModel.IsAuthenticated = false;
                 authenticationModel.Message = $"Token Not Active";
+                return authenticationModel;
             }
 
             // Revoke the current refresh token
