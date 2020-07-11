@@ -12,8 +12,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Internal;
-using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Xamarin.Essentials;
 
 namespace ECSApi.Models
@@ -52,6 +50,7 @@ namespace ECSApi.Models
                 authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
                 authenticationModel.Email = user.Email;
                 authenticationModel.Name = user.Name;
+                authenticationModel.ProfilePictureUrl = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(user.ProfilePicture));
 
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
@@ -110,6 +109,7 @@ namespace ECSApi.Models
             authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authenticationModel.Email = user.Email;
             authenticationModel.Name = user.Name;
+            authenticationModel.ProfilePictureUrl = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(user.ProfilePicture));
             authenticationModel.RefreshToken = newRefreshToken.Token;
             authenticationModel.RefreshTokenExpiration = newRefreshToken.Expires;
             return authenticationModel;
