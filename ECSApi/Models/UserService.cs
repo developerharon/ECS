@@ -50,7 +50,7 @@ namespace ECSApi.Models
                 authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
                 authenticationModel.Email = user.Email;
                 authenticationModel.Name = user.Name;
-                authenticationModel.ProfilePictureUrl = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(user.ProfilePicture));
+                authenticationModel.ProfilePicture = user.ProfilePicture;
 
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
@@ -110,7 +110,7 @@ namespace ECSApi.Models
             authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authenticationModel.Email = user.Email;
             authenticationModel.Name = user.Name;
-            authenticationModel.ProfilePictureUrl = String.Format("data:image/jpg;base64, {0}", Convert.ToBase64String(user.ProfilePicture));
+            authenticationModel.ProfilePicture = user.ProfilePicture;
             authenticationModel.RefreshToken = newRefreshToken.Token;
             authenticationModel.RefreshTokenExpiration = newRefreshToken.Expires;
             return authenticationModel;
