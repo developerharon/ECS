@@ -18,10 +18,10 @@ namespace ECSApi.Controllers
             _userService = userService;
         }
 
-        [HttpGet("{email}")]
-        public async Task<List<Timestamp>> GetAllClocksAsync(string email)
+        [HttpPost("email")]
+        public async Task<List<Timestamp>> GetAllClocksAsync([FromBody] string email)
         {
-            var result = await GetAllClocksAsync(email);
+            var result = await _userService.GetAllClocksAsync(email);
             return result;
         }
 
