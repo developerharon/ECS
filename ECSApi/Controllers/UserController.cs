@@ -36,7 +36,7 @@ namespace ECSApi.Controllers
             var profilePic = await _userService.GetProfilePictureAsync(email);
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
             result.Content = new ByteArrayContent(profilePic);
-            result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpg");
+            result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
             return result;
         }
 
