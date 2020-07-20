@@ -1,6 +1,7 @@
 ﻿using Ecs.Models;
 using ECSApi.Models.ApiModels;
 using System.Collections.Generic;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace ECSApi.Models
@@ -14,5 +15,6 @@ namespace ECSApi.Models
         Task<TimestampResponseModel> ClockOutAsync(TimestampModel model);
         Task<TimestampResponseModel> GetActiveClockAsync(string email);
         Task<List<Timestamp>> GetAllClocksAsync(string email);
+        Task<MemoryStream> GetProfilePictureAsync(string email);
     }
 }

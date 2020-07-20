@@ -13,6 +13,9 @@ using System.Text;
 using System.Security.Cryptography;
 using Microsoft.EntityFrameworkCore.Internal;
 using Xamarin.Essentials;
+using System.Net.Http;
+using static System.Net.Mime.MediaTypeNames;
+using System.IO;
 
 namespace ECSApi.Models
 {
@@ -50,7 +53,7 @@ namespace ECSApi.Models
                 authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
                 authenticationModel.Email = user.Email;
                 authenticationModel.Name = user.Name;
-                authenticationModel.ProfilePicture = user.ProfilePicture;
+
 
                 if (user.RefreshTokens.Any(a => a.IsActive))
                 {
@@ -110,7 +113,6 @@ namespace ECSApi.Models
             authenticationModel.Token = new JwtSecurityTokenHandler().WriteToken(jwtSecurityToken);
             authenticationModel.Email = user.Email;
             authenticationModel.Name = user.Name;
-            authenticationModel.ProfilePicture = user.ProfilePicture;
             authenticationModel.RefreshToken = newRefreshToken.Token;
             authenticationModel.RefreshTokenExpiration = newRefreshToken.Expires;
             return authenticationModel;
@@ -238,7 +240,7 @@ namespace ECSApi.Models
             var response = new List<Timestamp>();
 
             var user = await _userManager.FindByEmailAsync(email);
-            
+
             if (user == null)
             {
                 return null;
@@ -300,6 +302,22 @@ namespace ECSApi.Models
         {
             // Location Logic here
             return true;
+        }
+
+        public async Task<MemoryStream> GetProfilePictureAsync(string email)
+        {
+            if (email == null)
+                return null;
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+                return null;
+
+            if (user.ProfilePicture == null)
+                return null;
+
+            return new MemoryStream(user.ProfilePicture);
         }
     }
 }

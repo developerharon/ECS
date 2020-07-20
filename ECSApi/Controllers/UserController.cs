@@ -1,8 +1,12 @@
 ﻿using Ecs.Models;
 using ECSApi.Models;
 using ECSApi.Models.ApiModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 
 namespace ECSApi.Controllers
@@ -22,6 +26,16 @@ namespace ECSApi.Controllers
         public async Task<List<Timestamp>> GetAllClocksAsync([FromBody] string email)
         {
             var result = await _userService.GetAllClocksAsync(email);
+            return result;
+        }
+
+        [HttpPost("profile-picture")]
+        public async Task<HttpResponseMessage> GetProfilePictureAsync([FromBody] string email)
+        {
+            MemoryStream profilePic = await _userService.GetProfilePictureAsync(email);
+            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
+            result.Content = new ByteArrayContent(profilePic.ToArray());
+            result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpg");
             return result;
         }
 
