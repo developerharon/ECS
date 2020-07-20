@@ -304,7 +304,7 @@ namespace ECSApi.Models
             return true;
         }
 
-        public async Task<MemoryStream> GetProfilePictureAsync(string email)
+        public async Task<byte[]> GetProfilePictureAsync(string email)
         {
             if (email == null)
                 return null;
@@ -317,7 +317,7 @@ namespace ECSApi.Models
             if (user.ProfilePicture == null)
                 return null;
 
-            return new MemoryStream(user.ProfilePicture);
+            return user.ProfilePicture;
         }
     }
 }

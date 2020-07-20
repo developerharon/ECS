@@ -3,6 +3,7 @@ using ECSApi.Models;
 using ECSApi.Models.ApiModels;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -32,9 +33,9 @@ namespace ECSApi.Controllers
         [HttpPost("profile-picture")]
         public async Task<HttpResponseMessage> GetProfilePictureAsync([FromBody] string email)
         {
-            MemoryStream profilePic = await _userService.GetProfilePictureAsync(email);
+            var profilePic = await _userService.GetProfilePictureAsync(email);
             HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            result.Content = new ByteArrayContent(profilePic.ToArray());
+            result.Content = new ByteArrayContent(profilePic);
             result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpg");
             return result;
         }
