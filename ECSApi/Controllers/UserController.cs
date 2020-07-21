@@ -1,10 +1,13 @@
 ﻿using Ecs.Models;
 using ECSApi.Models;
 using ECSApi.Models.ApiModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.VisualStudio.Web.CodeGeneration.Contracts.Messaging;
+using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace ECSApi.Controllers
@@ -28,13 +31,10 @@ namespace ECSApi.Controllers
         }
 
         [HttpPost("profile-picture")]
-        public async Task<HttpResponseMessage> GetProfilePictureAsync([FromBody] string email)
+        public async Task<IActionResult> GetProfilePicture([FromBody] string email)
         {
-            var profilePic = await _userService.GetProfilePictureAsync(email);
-            HttpResponseMessage result = new HttpResponseMessage(HttpStatusCode.OK);
-            //result.Content = new ByteArrayContent(profilePic);
-            result.Content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("image/jpeg");
-            return result;
+            string profilePicture = await _userService.GetProfilePicture(email);
+            return Ok(new { pic = profilePicture });
         }
 
         [HttpPost("login")]
