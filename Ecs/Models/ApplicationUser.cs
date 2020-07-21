@@ -7,7 +7,7 @@ namespace Ecs.Models
     {
         public string Name { get; set; }
         public string Department { get; set; }
-        public byte[] ProfilePicture { get; set; }
+        public string ProfilePicture { get; set; }
         public List<RefreshToken> RefreshTokens { get; set; }
         public List<Timestamp> Timestamps { get; set; }
     }

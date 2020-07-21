@@ -1,11 +1,15 @@
 ﻿using Ecs.Models;
 using Ecs.Models.ViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Resources;
 using System.Threading.Tasks;
 
 namespace Ecs.Controllers
@@ -16,12 +20,14 @@ namespace Ecs.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IUserValidator<ApplicationUser> _userValidator;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUserValidator<ApplicationUser> userValidator)
+        public AdminController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IUserValidator<ApplicationUser> userValidator, IWebHostEnvironment webHostEnvironment)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _userValidator = userValidator;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         public IActionResult Index()
@@ -63,22 +69,16 @@ namespace Ecs.Controllers
                     return View(model);
                 }
 
+                string uniqueProfilePicUrl = GetProfilePictureUrl(model.ProfilePicture);
+
                 ApplicationUser user = new ApplicationUser
                 {
                     UserName = model.Username,
                     Email = model.Email,
                     Name = model.Name,
                     Department = model.Department,
+                    ProfilePicture = uniqueProfilePicUrl
                 };
-
-                if (model.ProfilePicture != null)
-                {
-                    using (var dataStream = new MemoryStream())
-                    {
-                        await model.ProfilePicture.CopyToAsync(dataStream);
-                        user.ProfilePicture = dataStream.ToArray();
-                    }
-                }
 
                 IdentityResult result = await _userManager.CreateAsync(user, model.NewPassword);
 
@@ -133,13 +133,12 @@ namespace Ecs.Controllers
                     user.Email = model.Email;
                     user.Department = model.Department;
 
-                    if (model.ProfilePicture != null)
+                    string uniqueProfilePicUrl = GetProfilePictureUrl(model.ProfilePicture);
+
+                    if (uniqueProfilePicUrl != null)
                     {
-                        using (var datastream = new MemoryStream())
-                        {
-                            await model.ProfilePicture.CopyToAsync(datastream);
-                            user.ProfilePicture = datastream.ToArray();
-                        }
+                        DeleteProfilePicture(user.ProfilePicture);
+                        user.ProfilePicture = uniqueProfilePicUrl;
                     }
 
                     IdentityResult validUser = await _userValidator.ValidateAsync(_userManager, user);
@@ -254,6 +253,35 @@ namespace Ecs.Controllers
             foreach (IdentityError error in result.Errors)
             {
                 ModelState.AddModelError("", error.Description);
+            }
+        }
+
+        private string GetProfilePictureUrl(IFormFile profilePicture)
+        {
+            string uniqueUrl = null;
+
+            if (profilePicture != null)
+            {
+                string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "images");
+                var fileName = Path.GetFileName(profilePicture.FileName);
+                uniqueUrl = Guid.NewGuid().ToString() + "-" + fileName;
+                var filePath = Path.Combine(uploadsFolder, uniqueUrl);
+
+                using (var fileStream = new FileStream(filePath, FileMode.Create))
+                {
+                    profilePicture.CopyTo(fileStream);
+                }
+            }
+
+            return uniqueUrl;
+        }
+
+        private void DeleteProfilePicture(string profilePictureUrl)
+        {
+            if (profilePictureUrl != null)
+            {
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", profilePictureUrl);
+                if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
             }
         }
     }

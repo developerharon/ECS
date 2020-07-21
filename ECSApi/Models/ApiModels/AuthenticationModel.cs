@@ -13,5 +13,6 @@ namespace ECSApi.Models.ApiModels
         public string Token { get; set; }
         public string RefreshToken { get; set; }
         public DateTime RefreshTokenExpiration { get; set; }
+        public string ProfilePictureUrl { get; set; }
     }
 }
