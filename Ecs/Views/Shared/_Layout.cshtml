@@ -1,16 +1,33 @@
 ﻿<!DOCTYPE html>
-
-<html>
+<html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width" />
-    <title>ECS</title>
-    <link href="/lib/twitter-bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>ECS Admin - Dashboard</title>
+    <partial name="_Styles" />
 </head>
-<body>
-    @if (TempData["message"] != null)
-    {
-        <div class="alert alert-success">@TempData["message"]</div>
-    }
-    @RenderBody()
+
+<body id="page-top">
+    <div id="wrapper">
+        <partial name="_Sidebar" />
+
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <partial name="_Topbar" />
+
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </div>
+
+            <partial name="_Footer" />
+        </div>
+    </div>
+    <partial name="_LogoutModal" />
+
+    <partial name="_Scripts" />
 </body>
 </html>
