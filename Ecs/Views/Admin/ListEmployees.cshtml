@@ -1,51 +1,69 @@
 ﻿@model IEnumerable<ApplicationUser>
 
-<div class="text-center">
-    <form class="form-inline mt-2 mt-md-0" style="width:100%; max-width:330px; padding:15px; margin: auto" method="get">
-        <input class="form-control mr-sm-2 text-center" type="text" name="searchParameter" placeholder="Search" aria-label="Search" />
-        <button type="submit" asp-action="ListEmployees" asp-controller="Admin" class="btn btn-outline-success my-2 my-sm-0">
-            <img src="/images/search.svg" alt="" />
-        </button>
-    </form>
+<!-- DataTales Example -->
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">All Employees</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Profile Picture</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Profile Picture</th>
+                        <th>Username</th>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>Department</th>
+                        <th>Action</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @if (Model.Count() == 0)
+                    {
+                        <tr><td colspan="6" class="text-center">No Users Accounts</td></tr>
+                    }
+                    else
+                    {
+                        foreach (var user in Model)
+                        {
+                            <tr>
+                                @if (user.ProfilePicture == null)
+                                {
+                                    <td class="text-center"><img src="/images/profile-pic.png" alt="" class="rounded-circle" width="40" height="40" /></td>
+                                }
+                                else
+                                {
+                                    <td class="text-center"><img src="/images/@user.ProfilePicture" alt="" class="rounded-circle" width="40" height="40" /></td>
+                                }
+                                <td>@user.UserName</td>
+                                <td>@user.Name</td>
+                                <td>@user.Email</td>
+                                <td>@user.Department</td>
+                                <td>
+                                    <form asp-action="MakeAdministrator" asp-controller="Admin" asp-route-id="@user.Id" method="post" class="form-inline">
+                                        <button class="btn btn-sm btn-outline-success" type="submit">Make Admin</button>
+                                    </form>
+                                    <form asp-action="Delete" asp-controller="Admin" asp-route-id="@user.Id" method="post" class="form-inline">
+                                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@user.Id">Edit</a>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
-
-<table class="table table-sm table-bordered">
-    <tr><th>ID</th><th>Profile Picture</th><th>Username</th><th>Name</th><th>Email</th><th>Department</th><th>Actions</th></tr>
-
-    @if (Model.Count() == 0)
-    {
-        <tr><td colspan="6" class="text-center">No Users Accounts</td></tr>
-    }
-    else
-    {
-        @foreach (ApplicationUser user in Model)
-        {
-            <tr>
-                <td>@user.Id</td>
-                @if (user.ProfilePicture == null)
-                {
-                    <td class="text-center"><img src="/images/profile-pic.png" alt="" class="rounded-circle" width="40" height="40" /></td>
-                }
-                else
-                {
-                    <td class="text-center"><img src="/images/@user.ProfilePicture" alt="" class="rounded-circle" width="40" height="40" /></td>
-                }
-                <td>@user.UserName</td>
-                <td>@user.Name</td>
-                <td>@user.Email</td>
-                <td>@user.Department</td>
-                <td>
-                    <form asp-action="MakeAdministrator" asp-route-id="@user.Id" method="post" class="form-inline">
-                        <button class="btn btn-sm btn-outline-success" type="submit">Make Admin</button>
-                    </form>
-                    <form asp-action="Delete" asp-controller="Admin" asp-route-id="@user.Id" method="post">
-                        <a class="btn btn-sm btn-outline-primary" asp-action="Edit" asp-route-id="@user.Id">Edit</a>
-                        <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        }
-    }
-</table>
-
-<a class="btn btn-primary" asp-action="Create">Create</a>
