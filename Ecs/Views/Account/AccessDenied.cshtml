@@ -1,2 +1,33 @@
-﻿<div class="bg-danger mb-1 p-2 text-white"><h4>Access Denied</h4></div>
-<a asp-action="Login" asp-controller="Account" class="btn btn-outline-primary">OK</a>
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>ECS Admin - Access Denied</title>
+    <partial name="_Styles" />
+</head>
+<body id="page-top">
+    <div id="wrapper">
+        <div id="content-wrapper" class="d-flex flex-column">
+            <div id="content">
+                <div class="container-fluid">
+                    <div class="text-center">
+                        <div class="error mx-auto" data-text="401">401</div>
+                        <p class="lead text-gray-800 mb-5">Access Denied</p>
+                        <p class="text-gray-500 mb-0">It looks like you are not a system administrator</p>
+                        <a asp-action="Login" asp-controller="Account">&larr; Back to Login Page</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <partial name="_Scripts" />
+</body>
+</html>

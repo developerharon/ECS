@@ -1,30 +1,43 @@
 ﻿@model EditViewModel
 
-<form asp-action="Edit" asp-controller="Admin" method="post" enctype="multipart/form-data">
-    <div class="form-group">
-        <label asp-for="Id"></label>
-        <input asp-for="Id" class="form-control" disabled />
-        <div class="text-danger"><span asp-validation-for="Id"></span></div>
+<div class="container">
+    <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card-body p-0">
+            <div class="row">
+                <div class="col-lg-5 d-none d-lg-block bg-register-image"></div>
+                <div class="col-lg-7">
+                    <div class="p-5">
+                        <div class="text-center">
+                            <h1 class="h4 text-gray-900 mb-4">Edit Employee Details</h1>
+                        </div>
+                        <form asp-action="Edit" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                            <input asp-for="@Model.Id" type="hidden" />
+                            <div class="form-group">
+                                <input asp-for="@Model.ProfilePicture" class="form-control form-control-user">
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="@Model.Name" type="text" class="form-control form-control-user" id="exampleLastName" placeholder="Full Name">
+                                <span asp-validation-for="@Model.Name" class="text-danger text-decoration-none small"></span>
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="@Model.Email" type="email" class="form-control form-control-user" id="exampleInputEmail" placeholder="Email Address">
+                                <span asp-validation-for="@Model.Email" class="text-danger text-decoration-none small"></span>
+                            </div>
+                            <div class="form-group">
+                                <input asp-for="@Model.Department" type="text" class="form-control form-control-user" id="exampleInputEmail" placeholder="Department">
+                                <span asp-validation-for="@Model.Department" class="text-danger text-decoration-none small"></span>
+                            </div>
+                            <button type="submit" class="btn btn-primary btn-user btn-block">
+                                Update Employee
+                            </button>
+                            <hr />
+                            <a asp-action="ListEmployees" asp-controller="Admin" class="btn btn-danger btn-user btn-block">
+                                Cancel
+                            </a>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="Name"></label>
-        <input asp-for="Name" class="form-control" />
-        <div class="text-danger"><span asp-validation-for="Name"></span></div>
-    </div>
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" type="email" class="form-control" />
-        <div class="text-danger"><span asp-validation-for="Email"></span></div>
-    </div>
-    <div class="form-group">
-        <label asp-for="Department"></label>
-        <input asp-for="Department" class="form-control" />
-        <div class="text-danger"><span asp-validation-for="Department"></span></div>
-    </div>
-    <div class="form-group">
-        <label asp-for="ProfilePicture">Profile Picture</label>
-        <input asp-for="ProfilePicture" />
-    </div>
-    <button type="submit" class="btn btn-outline-primary">Update Profile</button>
-    <a asp-action="ListEmployees" class="btn btn-outline-danger">Cancel</a>
-</form>
+</div>

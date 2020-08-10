@@ -1,32 +1,57 @@
 ﻿@model IEnumerable<ApplicationUser>
 
-<div class="bg-primary m-1 p-1 text-white"><h4>Timestamps</h4></div>
-
-<table class="table table-bordered table-striped">
-    <tr><th>Name</th><th>Department</th><th colspan="4">Timestamps</th></tr>
-    @if (Model.Count() > 0)
-    {
-        @foreach(ApplicationUser user in Model)
-        {
-            @if (user.Timestamps.Count() == 0) continue;
-            <tr>
-                <td>@user.Name</td>
-                <td>@user.Department</td>
-            </tr>
-            @foreach (var timestamp in user.Timestamps)
-            {
-                <tr>
-                    <td colspan="2"></td>
-                    <td>@timestamp.In</td>
-                    <td>@timestamp.InWhileOnPremises</td>
-                    <td>@timestamp.Out</td>
-                    <td>@timestamp.OutWhileOnPremises</td>
-                </tr>
-            }
-        }
-    }
-    else
-    {
-        <tr><td colspan="3">No Clocks at the moment.</td></tr>
-    }
-</table>
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">Timestamps</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Time In</th>
+                        <th>Location</th>
+                        <th>Time Out</th>
+                        <th>Location</th>
+                    </tr>
+                </thead>
+                <tfoot>
+                    <tr>
+                        <th>Name</th>
+                        <th>Department</th>
+                        <th>Time In</th>
+                        <th>Location</th>
+                        <th>Time Out</th>
+                        <th>Location</th>
+                    </tr>
+                </tfoot>
+                <tbody>
+                    @if (Model.Count() > 0)
+                    {
+                        @foreach (ApplicationUser user in Model)
+                        {
+                            @if (user.Timestamps.Count() == 0) continue;
+                            @foreach (var timestamp in user.Timestamps)
+                            {
+                                <tr>
+                                    <td>@user.Name</td>
+                                    <td>@user.Department</td>
+                                    <td>@timestamp.In</td>
+                                    <td>@timestamp.InWhileOnPremises ? "Premises" : "NoP"</td>
+                                    <td>@timestamp.Out</td>
+                                    <td>@timestamp.OutWhileOnPremises ? "Premises" : "NoP"</td>
+                                </tr>
+                            }
+                        }
+                    }
+                    else
+                    {
+                        <tr><td colspan="6">No timestamps at the moment.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
