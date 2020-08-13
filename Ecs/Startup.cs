@@ -21,6 +21,7 @@ namespace Ecs
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddScoped<IUserService, UserService>();
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(_configuration.GetConnectionString("DefaultConnection"), b => b.MigrationsAssembly(typeof(ApplicationDbContext).Assembly.FullName)));
 
             services.AddIdentity<ApplicationUser, IdentityRole>(options => options.User.RequireUniqueEmail = true).AddEntityFrameworkStores<ApplicationDbContext>().AddDefaultTokenProviders();
