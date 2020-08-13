@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using Xamarin.Essentials;
 
-namespace ECS.Models.ApiModels
+namespace Ecs.Models.ApiModels
 {
     public class TimestampModel
     {

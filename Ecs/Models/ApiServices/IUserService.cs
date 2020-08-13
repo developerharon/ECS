@@ -1,9 +1,8 @@
-﻿using Ecs.Models;
-using ECS.Models.ApiModels;
+﻿using Ecs.Models.ApiModels;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ECS.Models.ApiServices
+namespace Ecs.Models.ApiServices
 {
     public interface IUserService
     {

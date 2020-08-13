@@ -1,4 +1,4 @@
-﻿namespace ECS.Models.ApiModels
+﻿namespace Ecs.Models.ApiModels
 {
     public class AuthenticationModel
     {

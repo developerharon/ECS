@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ECS.Models.ApiModels
+namespace Ecs.Models.ApiModels
 {
     public class TokenRequestModel
     {

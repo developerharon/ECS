@@ -1,4 +1,5 @@
 using Ecs.Models;
+using Ecs.Models.ApiServices;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;

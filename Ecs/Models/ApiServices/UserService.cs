@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Ecs.Models;
-using ECS.Models.ApiModels;
+using Ecs.Models.ApiModels;
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore.Internal;
 using Xamarin.Essentials;
 
-namespace ECS.Models.ApiServices
+namespace Ecs.Models.ApiServices
 {
     public class UserService : IUserService
     {

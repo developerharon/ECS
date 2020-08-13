@@ -1,8 +1,9 @@
-﻿using Ecs.Models.ApiServices;
-using Ecs.Models;
+﻿using Ecs.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Ecs.Models.ApiServices;
+using Ecs.Models.ApiModels;
 
 namespace ECS.ApiControllers.Controllers
 {
@@ -17,7 +18,14 @@ namespace ECS.ApiControllers.Controllers
             _userService = userService;
         }
 
-        [HttpPost("email")]
+        [HttpPost("login")]
+        public async Task<AuthenticationModel> LoginAsync(TokenRequestModel model)
+        {
+            var result = await _userService.LoginAsync(model);
+            return result;
+        }
+
+        [HttpPost("get-clock")]
         public async Task<List<Timestamp>> GetAllClocksAsync([FromBody] string email)
         {
             var result = await _userService.GetAllClocksAsync(email);
@@ -29,34 +37,6 @@ namespace ECS.ApiControllers.Controllers
         {
             string profilePicture = await _userService.GetProfilePicture(email);
             return Ok(new { pic = profilePicture });
-        }
-
-        [HttpPost("login")]
-        public async Task<IActionResult> GetTokenAsync(TokenRequestModel model)
-        {
-            var result = await _userService.GetTokenAsync(model);
-            return Ok(result);
-        }
-
-        [HttpPost("refresh-token")]
-        public async Task<IActionResult> RefreshToken([FromBody] string refreshToken)
-        {
-            var result = await _userService.RefreshTokenAsync(refreshToken);
-            return Ok(result);
-        }
-
-        [HttpPost("revoke-token")]
-        public IActionResult RevokeToken([FromBody] string token)
-        {
-            if (string.IsNullOrEmpty(token))
-                return BadRequest(new { message = "Token is required" });
-
-            var response = _userService.RevokeToken(token);
-
-            if (!response)
-                return NotFound(new { message = "Token not found" });
-
-            return Ok(new { message = "Token Revoked" });
         }
 
         [HttpPost("clock-in")]
