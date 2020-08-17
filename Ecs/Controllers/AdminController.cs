@@ -31,7 +31,8 @@ namespace Ecs.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            DashboardViewModel model = GetDashboardSummary();
+            return View(model);
         }
 
         public IActionResult ListEmployees(string searchParameter = null)
@@ -282,6 +283,33 @@ namespace Ecs.Controllers
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, "images", profilePictureUrl);
                 if (System.IO.File.Exists(filePath)) System.IO.File.Delete(filePath);
             }
+        }
+
+        private DashboardViewModel GetDashboardSummary()
+        {
+            var result = new DashboardViewModel();
+            var employees = _userManager.Users;
+
+            result.TotalNumberOfEmployees = employees.Count();
+
+            foreach (ApplicationUser user in employees)
+            {
+                foreach (Timestamp clock in user.Timestamps)
+                {
+                    if (clock.IsActive && clock.In.Date == DateTime.Now.Date)
+                    {
+                        result.TotalNumberOfActiveClocks += 1;
+                        continue;
+                    }
+
+                    if (!clock.IsActive && clock.In.Date == DateTime.Now.Date)
+                    {
+                        result.TotalNumberOfClosedClocks += 1;
+                    }
+                }
+            }
+
+            return result;
         }
     }
 }
