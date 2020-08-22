@@ -25,7 +25,7 @@ namespace ECS.ApiControllers.Controllers
             return result;
         }
 
-        [HttpPost("get-clock")]
+        [HttpPost("get-clocks")]
         public async Task<List<Timestamp>> GetAllClocksAsync([FromBody] string email)
         {
             var result = await _userService.GetAllClocksAsync(email);
