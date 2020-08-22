@@ -159,8 +159,13 @@ namespace Ecs.Models.ApiServices
 
         private bool IsEmployeeOnPremises(Location clockLocation)
         {
-            // Location Logic here
-            return true;
+            LocationService locationService = new LocationService();
+            Point[] premises = { new Point(3818628, 353046193), new Point(3818628, 353046193), new Point(3818628, 353046193), new Point(3818628, 353046193) };
+            int latitude = (int)clockLocation.Latitude * 10000000;
+            int longitude = (int)clockLocation.Longitude * 10000000;
+            Point pointLocation = new Point(latitude, longitude);
+            bool isEmployeeInsidePremises = locationService.IsInside(premises, premises.Length, pointLocation);
+            return isEmployeeInsidePremises;
         }
 
         public async Task<string> GetProfilePicture(string email)

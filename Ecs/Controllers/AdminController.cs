@@ -309,6 +309,76 @@ namespace Ecs.Controllers
                 }
             }
 
+            result.Averages.WeeklyAverages = GetWeeklyAverage();
+            result.Averages.MonthlyAverages = GetMonthlyAverage();
+            result.Averages.YearlyAverages = GetYearlyDouble();
+
+            return result;
+        }
+
+        private double GetWeeklyAverage()
+        {
+            double result = 0.0;
+            var users = _userManager.Users;
+
+            double sum = 0;
+
+            foreach(var user in users)
+            {
+                foreach (Timestamp stamp in user.Timestamps)
+                {
+                    if (stamp.Out.AddDays(7) >= DateTime.Now)
+                    {
+                        sum += stamp.Out.Hour - stamp.In.Hour;
+                    }
+                }
+            }
+
+            result = sum / 7;
+            return result;
+        }
+
+        private double GetMonthlyAverage()
+        {
+            double result = 0.0;
+            var users = _userManager.Users;
+
+            double sum = 0;
+
+            foreach (var user in users)
+            {
+                foreach (Timestamp stamp in user.Timestamps)
+                {
+                    if (stamp.Out.AddDays(28) >= DateTime.Now)
+                    {
+                        sum += stamp.Out.Hour - stamp.In.Hour;
+                    }
+                }
+            }
+
+            result = sum / 7;
+            return result;
+        }
+
+        private double GetYearlyDouble()
+        {
+            double result = 0.0;
+            var users = _userManager.Users;
+
+            double sum = 0;
+
+            foreach (var user in users)
+            {
+                foreach (Timestamp stamp in user.Timestamps)
+                {
+                    if (stamp.Out.AddDays(365) >= DateTime.Now)
+                    {
+                        sum += stamp.Out.Hour - stamp.In.Hour;
+                    }
+                }
+            }
+
+            result = sum / 7;
             return result;
         }
     }

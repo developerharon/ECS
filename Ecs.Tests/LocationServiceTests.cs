@@ -40,5 +40,16 @@ namespace Ecs.Tests
             Assert.True(isPoint1OnTheEdge);
             Assert.True(isPoint2OnTheEdge);
         }
+
+        [Fact]
+        public void Can_Validate_A_Point()
+        {
+            Point[] premises = { new Point(3, 3), new Point(3, 3), new Point(3, 3), new Point(3, 3) };
+            Point point1 = new Point(3, 3);
+
+            bool isPointInside = _locationService.IsInside(premises, premises.Length, point1);
+
+            Assert.True(isPointInside);
+        }
     }
 }
