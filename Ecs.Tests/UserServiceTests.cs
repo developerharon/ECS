@@ -9,16 +9,6 @@ namespace Ecs.Tests
         Point[] _premises = { new Point(3818628, 353046193), new Point(3818628, 353046193), new Point(3818628, 353046193), new Point(3818628, 353046193) };
 
         [Fact]
-        public void Operator_Precedence_Causes_Validation_To_Fail()
-        {
-            UserService userService = new UserService(null, null);
-
-            bool isUserOnPremises = userService.IsEmployeeOnPremises(0.38186283, 35.3046193);
-
-            Assert.True(isUserOnPremises);
-        }
-
-        [Fact]
         public void Can_Validate_Users_Location()
         {
             int latitude = (int)(0.38186283 * 10000000);
