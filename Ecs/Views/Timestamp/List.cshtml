@@ -39,9 +39,26 @@
                                     <td>@user.Name</td>
                                     <td>@user.Department</td>
                                     <td>@timestamp.In</td>
-                                    <td>@timestamp.InWhileOnPremises ? "Premises" : "NoP"</td>
+
+                                    @if (timestamp.InWhileOnPremises)
+                                    {
+                                        <td>On Premises</td>
+                                    }
+                                    else
+                                    {
+                                        <td>Outside Premises</td>
+                                    }
+
                                     <td>@timestamp.Out</td>
-                                    <td>@timestamp.OutWhileOnPremises ? "Premises" : "NoP"</td>
+
+                                    @if (timestamp.OutWhileOnPremises)
+                                    {
+                                        <td>On Premises</td>
+                                    }
+                                    else
+                                    {
+                                        <td>Outside Premises</td>
+                                    }
                                 </tr>
                             }
                         }
